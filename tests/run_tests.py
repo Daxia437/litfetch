@@ -1,6 +1,6 @@
 """Dependency-free test runner.
 
-`python tests/run_tests.py` works on any machine with Python 3.9+, which is the
+`python tests/run_tests.py` works on any machine with Python 3.10+, which is the
 point: the package is meant to be installable on three operating systems without
 dragging a test framework along. (pytest also works, if you happen to have it.)
 

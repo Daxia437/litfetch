@@ -79,11 +79,11 @@ git remote add origin git@github.com:<org>/<name>.git
 git push -u origin main
 ```
 
-`ci.yml` runs on the push: 3 operating systems × Python 3.9/3.12/3.13, a job that
+`ci.yml` runs on the push: 3 operating systems × Python 3.10/3.12/3.13, a job that
 installs **no extras** (the standard-library contract for `core`), and a job that
 builds the sdist and wheel, installs the wheel into a clean venv, and checks the
-bundled skill. If 3.9 fails, the honest fix is to raise `requires-python` to 3.10
-rather than to drop the job.
+bundled skill. Python 3.9 was dropped rather than claimed: it is end-of-life and the
+run had become unverifiable (setup-python 504s fetching 3.9 on two runner images).
 
 ## 3. Tag a release
 

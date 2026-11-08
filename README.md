@@ -7,7 +7,7 @@ Built after a 2026-10 audit in which 10 of ~100 downloaded papers turned out to 
 The download was never the hard part. The verification was.
 
 Pure standard library. No network SDK, no browser automation required, no config file. Runs the same on
-macOS, Linux and Windows with Python 3.9+.
+macOS, Linux and Windows with Python 3.10+.
 
 ---
 

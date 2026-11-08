@@ -10,7 +10,7 @@ name = "litfetch"
 dynamic = ["version"]
 description = "Prove that a PDF is the paper it claims to be, and say which version of it you hold"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 # SPDX expression (PEP 639), not free text: it is machine-readable, and it is
 # what PyPI shows in the sidebar. The licence file must be shipped in the sdist.
 license = "MIT"
@@ -25,7 +25,6 @@ classifiers = [
   "Intended Audience :: Science/Research",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
