@@ -27,6 +27,13 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python: ["3.9", "3.12", "3.13"]
+        exclude:
+          # macOS runners are arm64 and their tool cache has no 3.9 build, so
+          # setup-python fails before any code runs. 3.9 stays covered on Linux
+          # and Windows -- which is still a real claim, tested rather than
+          # asserted. Drop the version entirely if it ever stops being true.
+          - os: macos-latest
+            python: "3.9"
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
