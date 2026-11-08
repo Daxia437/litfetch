@@ -30,7 +30,7 @@ from __future__ import annotations
 
 import importlib
 
-__version__ = "1.4.0"
+__version__ = "1.1.0"
 
 _EXPORTS = {
     # identity

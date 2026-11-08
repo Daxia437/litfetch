@@ -136,6 +136,8 @@ The first upload creates the project; later ones need no new configuration.
   container image) inherits AGPL obligations — see `NOTICE`.
 * The core is stdlib-only by design. Adding a hard dependency is a breaking
   change to that promise, not an implementation detail.
-* Version policy in `INTEGRATION_PLAN.md` §11 says `0.x` until the record schema
-  has survived three months of use; the package is currently `1.4.0`. Pick one
-  and make the README, the tag and the plan agree.
+* The first public release is `1.1.0`. The 1.3/1.4 numbers were private increments
+  during the `core`/`io` split, so the public sequence starts here and the tag, the
+  wheel and `litfetch --version` all say the same thing. §11 of the plan still asks
+  for `0.x` until the record schema has survived three months of use -- revisit that
+  at the next release rather than letting the three numbers drift apart again.
