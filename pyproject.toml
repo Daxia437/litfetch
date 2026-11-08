@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "litfetch"
+# One source of truth: the version lives in litfetch/__init__.py and is read here.
+# A wheel built with a version that disagrees with `litfetch --version` is the
+# exact drift this release exists to remove.
+dynamic = ["version"]
+description = "Prove that a PDF is the paper it claims to be, and say which version of it you hold"
+readme = "README.md"
+requires-python = ">=3.9"
+# SPDX expression (PEP 639), not free text: it is machine-readable, and it is
+# what PyPI shows in the sidebar. The licence file must be shipped in the sdist.
+license = "MIT"
+# Shipped inside the wheel at dist-info/licenses/, so the attribution travels
+# with the artifact instead of only living in the source checkout.
+license-files = ["LICENSE", "NOTICE"]
+authors = [{ name = "scientificRepresentation project" }]
+keywords = ["literature", "pdf", "doi", "open-access", "verification", "provenance", "reproducibility"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: Science/Research",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering",
+  "Topic :: Text Processing :: Indexing",
+]
+dependencies = []
+
+[project.optional-dependencies]
+pdf = ["pymupdf>=1.23"]
+browser = ["websocket-client>=1.6"]
+# Replays a Chrome TLS fingerprint on hosts that reject a plain Python client.
+# Measured: it helps against UA/TLS filtering and does NOT defeat Cloudflare's
+# JavaScript challenge, so it is a retry, never a solution.
+tls = ["curl_cffi>=0.7"]
+all = ["pymupdf>=1.23", "websocket-client>=1.6", "curl_cffi>=0.7"]
+dev = ["pytest>=7"]
+
+[project.scripts]
+litfetch = "litfetch.cli:main"
+
+[project.urls]
+Documentation = "https://github.com/OWNER/litfetch#readme"
+Source = "https://github.com/OWNER/litfetch"
+Issues = "https://github.com/OWNER/litfetch/issues"
+
+[tool.setuptools]
+packages = ["litfetch", "litfetch.core", "litfetch.io", "litfetch.skill"]
+
+[tool.setuptools.dynamic]
+version = { attr = "litfetch.__version__" }
+
+# The skill ships inside the wheel so that `litfetch skill install` and the CLI
+# can never disagree about what the skill says. One version number for both.
+[tool.setuptools.package-data]
+"litfetch.skill" = ["SKILL.md"]

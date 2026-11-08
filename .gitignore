@@ -1,0 +1,14 @@
+# build artefacts
+build/
+dist/
+*.egg-info/
+__pycache__/
+*.py[cod]
+
+# a local library is data, never part of the tool
+_libraries/
+
+# OS and editor noise
+.DS_Store
+.venv/
+.pytest_cache/

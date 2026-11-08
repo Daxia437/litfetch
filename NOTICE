@@ -1,0 +1,64 @@
+litfetch — NOTICE
+=================
+
+The package itself is MIT-licensed (see LICENSE).
+
+This file records three separate things, because they carry three different
+obligations: ideas taken from other tools, optional third-party code, and the
+services the tool talks to.
+
+1. Ideas borrowed (attribution, no code copied)
+-----------------------------------------------
+
+No third-party source code is vendored in this repository. The design borrowed
+the following ideas, each after a specific failure in the 2026-10 audit:
+
+  * "honest results" — report the route that produced a file and label it
+    preprint / accepted manuscript / version of record.
+    from: fulltext-article-downloader (computron)
+  * fail fast on a challenge or paywall page instead of retrying it.
+    from: scihub-cli (Oxidane-bot)
+  * resolve a title to a DOI by score and reject a weak match.
+    from: DoiHunter (mehmoodulhaq570)
+  * skip what is already present, and report "already there" separately from
+    "downloaded".  from: DoiHunter, scihub-cli
+  * Retry-After and per-host pacing.
+    from: scihub-cli; Unpaywall/Crossref terms of use
+  * provenance in the item rather than an external database (reading status).
+    from: Zotero "reading-list" / "Reading Flow" plugins
+  * an optional TLS-fingerprint retry, clearly labelled as a retry rather than a
+    solution.  from: fulltext-article-downloader's [tls] extra
+
+2. Optional third-party code (installed by the user, never bundled)
+-------------------------------------------------------------------
+
+The wheel contains no third-party code. These are extras:
+
+  extra      package            licence        note
+  ---------  -----------------  -------------  --------------------------------
+  pdf        PyMuPDF            AGPL-3.0       see the warning below
+  browser    websocket-client   Apache-2.0     Chrome DevTools Protocol client
+  tls        curl_cffi          MIT            Chrome TLS fingerprint replay
+  dev        pytest             MIT            test runner only
+
+  **PyMuPDF is AGPL-3.0, not MIT.** It is an optional extra and is never
+  vendored or redistributed here, so this repository stays MIT. But a *combined
+  distribution* that bundles PyMuPDF (a frozen app, a container image, an
+  all-in-one installer) inherits AGPL-3.0 obligations for that combination. If
+  you need to ship such a bundle under a non-AGPL licence, either obtain a
+  commercial PyMuPDF licence from Artifex or replace the `pdf` backend.
+  The core package runs without it: identity checks then degrade to
+  magic-byte and size checks, and `litfetch doctor` says so.
+
+3. Services contacted (their terms, not ours)
+---------------------------------------------
+
+  * arXiv API — 3 s between requests, as their terms ask.
+  * Crossref, OpenAlex, Unpaywall — metadata APIs; Unpaywall requires a contact
+    address (`LITFETCH_MAILTO`). Bulk metadata is not redistributed by this tool.
+  * Semantic Scholar, Europe PMC / PMC Open Access — their own terms.
+  * Publisher sites — fetched only where the network is already entitled to the
+    content. This tool contains no paywall circumvention and no Sci-Hub tier.
+
+Local libraries created by this tool contain third-party PDFs. Those files are
+data, are not part of this repository, and are not redistributed with it.

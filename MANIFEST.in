@@ -1,0 +1,14 @@
+# Everything not listed here is either package data (handled by
+# [tool.setuptools.package-data]) or excluded by .gitignore.
+include LICENSE
+include NOTICE
+include README.md
+include pyproject.toml
+include INTEGRATION_PLAN.md
+include RELEASING.md
+
+# The test suite is part of the source distribution on purpose: a redistributed
+# tarball should be verifiable by whoever downloads it, without a git checkout.
+recursive-include tests *.py
+
+global-exclude .DS_Store __pycache__ *.py[cod]
