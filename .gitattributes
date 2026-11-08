@@ -1,0 +1,5 @@
+# Normalise line endings. The packaged SKILL.md is compared byte-for-byte with
+# what the CLI reads, and that check failed on Windows the first time CI ran:
+# git's autocrlf turned the file into CRLF while the reader returned LF.
+# LF in the checkout on every platform makes the comparison mean what it says.
+* text=auto eol=lf

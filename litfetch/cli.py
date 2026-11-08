@@ -76,19 +76,32 @@ def cmd_doctor(args) -> int:
         lib = Library(args.library)
         info["pdfs"] = len(lib.pdfs())
     _print(info)
-    problems = []
+    # Two severities, because they answer different questions. `fatal` means the
+    # tool cannot do its job: without a PDF backend identity checks collapse to
+    # magic-byte and size, which is the one degradation we refuse to call fine.
+    # `degraded` means a documented optional extra is absent -- the README says
+    # the package still runs, so doctor must not call that an environment
+    # failure, or `litfetch doctor` becomes unusable as a CI gate on a minimal
+    # install (which is exactly how the first public CI run failed).
+    fatal, degraded = [], []
     if not info["pdf_backend"]:
-        problems.append("no PDF backend: identity checks degrade to magic-byte only "
-                        "(pip install pymupdf)")
+        fatal.append("no PDF backend: identity checks degrade to magic-byte only "
+                     "(pip install pymupdf)")
     if not info["mailto_set"]:
-        problems.append("LITFETCH_MAILTO unset: Unpaywall tier is skipped "
+        degraded.append("LITFETCH_MAILTO unset: Unpaywall tier is skipped "
                         "(set it to your email; the APIs ask for one)")
     if not info.get("tls_impersonation"):
-        problems.append("curl_cffi absent: no TLS-fingerprint retry "
+        degraded.append("curl_cffi absent: no TLS-fingerprint retry "
                         "(pip install 'litfetch[tls]'; it does NOT defeat Cloudflare)")
-    for p in problems:
-        print("! " + p, file=sys.stderr)
-    return 0 if not problems else 2
+    for msg in fatal:
+        print("x " + msg, file=sys.stderr)
+    for msg in degraded:
+        print("! " + msg, file=sys.stderr)
+    if fatal:
+        return 2
+    if degraded and getattr(args, "strict", False):
+        return 2
+    return 0
 
 
 def cmd_verify(args) -> int:
@@ -952,6 +965,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     d = sub.add_parser("doctor", help="report what this machine supports")
     d.add_argument("--library")
+    d.add_argument("--strict", action="store_true",
+                   help="exit 2 on a degraded-but-working install too (missing "
+                        "LITFETCH_MAILTO or curl_cffi), not only on a fatal one")
     d.set_defaults(func=cmd_doctor)
 
     v = sub.add_parser("verify", help="apply the four conditions to one file")

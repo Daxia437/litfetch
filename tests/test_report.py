@@ -154,3 +154,68 @@ def test_fetch_json_keeps_stdout_parseable(tmp_path, monkeypatch):
     assert payload["reasons"][0]["reason"] == "cloudflare"
     assert payload["gaps"] == 1
     assert "why 1 of 1 were not stored" in err.getvalue()
+
+
+# -------------------------------------------------------------------- doctor
+
+MISSING = object()
+
+
+class _Modules:
+    """Force `import pymupdf` to succeed or fail, whatever this machine has."""
+
+    def __init__(self, pdf_backend: bool):
+        self.pdf_backend = pdf_backend
+        self.saved = {}
+
+    def __enter__(self):
+        import types
+        for name in ("pymupdf", "fitz"):
+            self.saved[name] = sys.modules.get(name, MISSING)
+            sys.modules[name] = (types.ModuleType(name) if self.pdf_backend else None)
+        return self
+
+    def __exit__(self, *exc):
+        for name, old in self.saved.items():
+            if old is MISSING:
+                sys.modules.pop(name, None)
+            else:
+                sys.modules[name] = old
+        return False
+
+
+def _doctor(**kw):
+    ns = argparse.Namespace(library=None, strict=False)
+    for k, v in kw.items():
+        setattr(ns, k, v)
+    out, err = io.StringIO(), io.StringIO()
+    with redirect_stdout(out), redirect_stderr(err):
+        code = cli.cmd_doctor(ns)
+    return code, err.getvalue()
+
+
+def test_doctor_calls_a_missing_mailto_a_warning_not_a_failure(monkeypatch):
+    """The README documents the extras as optional, so a minimal install that
+    still verifies papers must not fail its own health check. The first public
+    CI run failed exactly here: exit 2 over an unset LITFETCH_MAILTO."""
+    monkeypatch.setattr(cli.sources, "DEFAULT_MAILTO", "")
+    with _Modules(pdf_backend=True):
+        code, err = _doctor()
+    assert code == 0
+    assert "LITFETCH_MAILTO" in err
+
+
+def test_doctor_strict_fails_on_a_degraded_install(monkeypatch):
+    monkeypatch.setattr(cli.sources, "DEFAULT_MAILTO", "")
+    with _Modules(pdf_backend=True):
+        code, err = _doctor(strict=True)
+    assert code == 2
+    assert "LITFETCH_MAILTO" in err
+
+
+def test_doctor_fails_when_identity_checks_cannot_run(monkeypatch):
+    monkeypatch.setattr(cli.sources, "DEFAULT_MAILTO", "someone@example.org")
+    with _Modules(pdf_backend=False):
+        code, err = _doctor()
+    assert code == 2
+    assert "no PDF backend" in err

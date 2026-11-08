@@ -134,7 +134,10 @@ The second candidate is itself a finding: the DOI now routes to Oxford Academic,
 ```
 
 Every subcommand takes `--json` (where it makes sense) and returns a meaningful exit code:
-`0` success, `1` verification failure, `2` environment problem. That makes it usable from CI:
+`0` success, `1` verification failure, `2` environment problem. `litfetch doctor` exits `2` only when
+the tool cannot verify anything at all (no PDF backend); a missing *optional* extra is a `!` warning
+and still exits `0`, because the package is documented to run without it. Add `--strict` when you want
+a minimal install to fail the gate. That makes it usable from CI:
 
 ```bash
 litfetch scan literature/ || echo "the library has non-PDFs again"
