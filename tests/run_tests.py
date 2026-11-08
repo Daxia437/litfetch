@@ -22,6 +22,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
+sys.path.insert(0, str(HERE))      # so a test can `from run_tests import Skip`
 
 _MISSING = object()
 
@@ -62,8 +63,17 @@ def load(name: str):
     return mod
 
 
+class Skip(Exception):
+    """Raised by a test that cannot run here, usually a missing optional extra.
+
+    A whole module is skipped by ImportError; this is the per-test version, so a
+    suite that runs without `pymupdf` says *why* one check did not happen instead
+    of quietly passing it.
+    """
+
+
 def main() -> int:
-    passed = failed = skipped = 0
+    passed = failed = skipped = skipped_tests = 0
     failures = []
     for modname in MODULES:
         try:
@@ -89,6 +99,9 @@ def main() -> int:
                 fn(**kwargs)
                 passed += 1
                 print(f"ok   {modname}.{name}")
+            except Skip as exc:
+                skipped_tests += 1
+                print(f"skip {modname}.{name}: {exc}")
             except Exception:
                 failed += 1
                 failures.append((modname, name, traceback.format_exc()))
@@ -98,7 +111,8 @@ def main() -> int:
                     mp.undo()
                 if tmp is not None:
                     shutil.rmtree(tmp, ignore_errors=True)
-    print(f"\n{passed} passed, {failed} failed, {skipped} module(s) skipped")
+    print(f"\n{passed} passed, {failed} failed, {skipped_tests} test(s) skipped, "
+          f"{skipped} module(s) skipped")
     for modname, name, tb in failures:
         print(f"\n--- {modname}.{name}\n{tb}")
     return 1 if failed else 0

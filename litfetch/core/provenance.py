@@ -330,7 +330,10 @@ def _rel(filename: str, root: Path) -> str:
     if not p.is_absolute():
         p = root / p          # a record written relative to the library, not the cwd
     try:
-        return str(p.resolve().relative_to(root.resolve()))
+        # POSIX separators, always. A library recorded on Windows must produce the
+        # same keys as one recorded on macOS, or the ledger stops matching the
+        # files as soon as the folder moves between machines.
+        return p.resolve().relative_to(root.resolve()).as_posix()
     except ValueError:
         return p.name
 
