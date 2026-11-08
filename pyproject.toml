@@ -48,9 +48,9 @@ dev = ["pytest>=7"]
 litfetch = "litfetch.cli:main"
 
 [project.urls]
-Documentation = "https://github.com/OWNER/litfetch#readme"
-Source = "https://github.com/OWNER/litfetch"
-Issues = "https://github.com/OWNER/litfetch/issues"
+Documentation = "https://github.com/Daxia437/litfetch#readme"
+Source = "https://github.com/Daxia437/litfetch"
+Issues = "https://github.com/Daxia437/litfetch/issues"
 
 [tool.setuptools]
 packages = ["litfetch", "litfetch.core", "litfetch.io", "litfetch.skill"]

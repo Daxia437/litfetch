@@ -19,9 +19,10 @@ Names checked free on PyPI on 2026-11-05: `litcheck`, `litverify`, `paperproof`,
 `citationproof`, `pdfattest`, `veripaper`, `citationaudit`, `litattest`,
 `paperaudit`. (`citecheck` is taken.) Re-check before committing to one.
 
-Whatever is chosen, replace `github.com/OWNER/litfetch` in `pyproject.toml` and
-`example.invalid` in the README install block. A release with a placeholder URL
-installs a package whose metadata points nowhere.
+The repository already exists at `github.com/Daxia437/litfetch` and `pyproject.toml`
+points at it. If the project is renamed, move the repository too (`gh repo rename`)
+and update those URLs in the same commit -- metadata pointing nowhere is worse than
+no metadata.
 
 ## 1. First commit
 

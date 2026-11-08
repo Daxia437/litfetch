@@ -15,7 +15,7 @@ macOS, Linux and Windows with Python 3.10+.
 
 ```bash
 # isolated, recommended
-pipx install "litfetch[all] @ git+https://example.invalid/litfetch"   # or from a local checkout:
+pipx install "litfetch[all] @ git+https://github.com/Daxia437/litfetch"   # or from a local checkout:
 pipx install "/path/to/tools/litfetch[all]"
 
 # or in a venv
