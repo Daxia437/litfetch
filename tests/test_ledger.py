@@ -31,7 +31,7 @@ def test_classify_a_c_and_duplicates(tmp_path):
               (tmp_path / "L1" / "Scholkopf_2021_Causal_Representation.pdf").read_bytes())
 
     rows = ledger.classify(tmp_path, ledger.parse_bibliography(BIB))
-    by_name = {str(r.path): r for r in rows}
+    by_name = {r.path.as_posix(): r for r in rows}
     assert by_name["L1/Scholkopf_2021_Causal_Representation.pdf"].status == "A"
     assert by_name["L1/Kipf_2018_NRI.pdf"].status == "C"
     assert by_name["L2/copy_of_scholkopf.pdf"].duplicate_of is not None

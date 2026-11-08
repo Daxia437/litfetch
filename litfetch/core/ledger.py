@@ -123,7 +123,7 @@ def summary(rows: Iterable[Row]) -> dict:
         "distinct": uniq,
         "duplicate_copies": files - uniq,
         **{k.lower(): counts.get(k, 0) for k in ("A", "B", "C", "X")},
-        "unread": [str(r.path) for r in rows if r.status == "C"],
+        "unread": [r.path.as_posix() for r in rows if r.status == "C"],
     }
 
 
@@ -138,7 +138,7 @@ def render(rows: Iterable[Row], heading: str = "Reading status (auto-generated)"
         lines += ["Unread (C):", ""] + [f"- `{u}`" for u in s["unread"]] + [""]
     by_dir: Dict[str, Counter] = {}
     for r in rows:
-        top = str(r.path).split("/")[0]
+        top = r.path.as_posix().split("/")[0]
         by_dir.setdefault(top, Counter())[r.status] += 1
     lines += ["| layer | A | B | C | X |", "|---|---|---|---|---|"]
     for top in sorted(by_dir):
@@ -162,7 +162,7 @@ def render_block(rows: Iterable[Row], heading: str = "Counts") -> str:
     s = summary(rows)
     by_dir: Dict[str, Counter] = {}
     for r in rows:
-        by_dir.setdefault(str(r.path).split("/")[0], Counter())[r.status] += 1
+        by_dir.setdefault(r.path.as_posix().split("/")[0], Counter())[r.status] += 1
 
     out = [BEGIN,
            f"**{heading}** (generated; run `litfetch ledger --write <file>` to refresh)",
@@ -187,8 +187,8 @@ def render_block(rows: Iterable[Row], heading: str = "Counts") -> str:
     out += ["", "## Full ledger"]
     for top in sorted(by_dir):
         out += ["", f"### {top}", "", "| file | status | evidence |", "|---|---|---|"]
-        for r in sorted(by_dir_rows(rows, top), key=lambda x: str(x.path)):
-            name = str(r.path).split("/", 1)[1] if "/" in str(r.path) else str(r.path)
+        for r in sorted(by_dir_rows(rows, top), key=lambda x: x.path.as_posix()):
+            name = r.path.as_posix().split("/", 1)[1] if "/" in r.path.as_posix() else r.path.as_posix()
             note = r.evidence
             if r.duplicate_of:
                 note += f" · duplicate of `{Path(str(r.duplicate_of)).name}`"
@@ -198,7 +198,7 @@ def render_block(rows: Iterable[Row], heading: str = "Counts") -> str:
 
 
 def by_dir_rows(rows: Iterable[Row], top: str) -> List[Row]:
-    return [r for r in rows if str(r.path).split("/")[0] == top]
+    return [r for r in rows if r.path.as_posix().split("/")[0] == top]
 
 
 def write_into(path: str | Path, block: str) -> str:
@@ -219,7 +219,7 @@ def write_into(path: str | Path, block: str) -> str:
 
 
 def to_json(rows: Iterable[Row]) -> str:
-    return json.dumps([{"path": str(r.path), "status": r.status,
+    return json.dumps([{"path": r.path.as_posix(), "status": r.status,
                         "evidence": r.evidence,
                         "duplicate_of": str(r.duplicate_of) if r.duplicate_of else None}
                        for r in rows], ensure_ascii=False, indent=1)

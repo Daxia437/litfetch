@@ -20,9 +20,11 @@ import tempfile
 import traceback
 from pathlib import Path
 
+from _support import Skip
+
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
-sys.path.insert(0, str(HERE))      # so a test can `from run_tests import Skip`
+sys.path.insert(0, str(HERE))      # so a test can `from _support import Skip`
 
 _MISSING = object()
 
@@ -61,15 +63,6 @@ def load(name: str):
     assert spec.loader is not None
     spec.loader.exec_module(mod)
     return mod
-
-
-class Skip(Exception):
-    """Raised by a test that cannot run here, usually a missing optional extra.
-
-    A whole module is skipped by ImportError; this is the per-test version, so a
-    suite that runs without `pymupdf` says *why* one check did not happen instead
-    of quietly passing it.
-    """
 
 
 def main() -> int:
