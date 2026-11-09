@@ -36,6 +36,24 @@ def test_check_detects_a_local_edit(tmp_path):
     assert _run("skill", "--target", str(tmp_path), "--check") == 1
 
 
+def test_the_skill_version_is_the_package_version():
+    """The README promises one version number for the CLI and the skill.
+
+    `skill --check` compares bytes, so it stayed silent while the front matter
+    advertised 3.3.0 inside a 1.1.0 wheel. Renumbering the package is exactly
+    when that happens, so the equality is asserted here instead.
+    """
+    import re
+
+    from litfetch import __version__
+
+    text = PACKAGED.read_text(encoding="utf-8")
+    m = re.search(r"^version:\s*(\S+)\s*$", text, re.MULTILINE)
+    assert m, "SKILL.md has no version: line in its front matter"
+    assert m.group(1) == __version__, (
+        f"SKILL.md says {m.group(1)}, the package says {__version__}")
+
+
 def test_check_fails_when_nothing_is_installed(tmp_path):
     assert _run("skill", "--target", str(tmp_path), "--check") == 1
 

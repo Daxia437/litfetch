@@ -1,9 +1,9 @@
 ---
 name: lit-fetch
-description: "获取学术文献 PDF（按引用清单批量）、**诊断为什么会失败**、区分**预印本/接收稿/正式版**、并把人工下载的文件核验入库。v3.3：随 wheel 分发（`litfetch skill` 写出 / `litfetch skill --check` 校验），与包同一版本号（纯标准库；标题块邻接核验；评分式 title→DOI；按域名快速失败；provenance 版本台账）。v3.4：`litfetch classify` 按「本机能否自动下载」给整份清单逐篇定性。Use when the user wants to download papers by title/DOI/reference list, fill an OA gap, find out why a publisher blocks them, tell a preprint from the version of record, verify/ingest hand-downloaded PDFs, or triage a reference list by reachability (auto-fetchable here vs needs a browser/subscription)."
+description: "获取学术文献 PDF（按引用清单批量）、**诊断为什么会失败**、区分**预印本/接收稿/正式版**、并把人工下载的文件核验入库。随 wheel 分发（`litfetch skill` 写出 / `litfetch skill --check` 校验），与包同一版本号（纯标准库；标题块邻接核验；评分式 title→DOI；按域名快速失败；provenance 版本台账）。`litfetch classify` 按「本机能否自动下载」给整份清单逐篇定性。Use when the user wants to download papers by title/DOI/reference list, fill an OA gap, find out why a publisher blocks them, tell a preprint from the version of record, verify/ingest hand-downloaded PDFs, or triage a reference list by reachability (auto-fetchable here vs needs a browser/subscription)."
 description_zh: "批量获取文献、诊断失败原因、区分版本（预印本/接收稿/正式版）、人工下载后核验入库"
 description_en: "Batch-fetch academic PDFs, diagnose failures, label the version, and ingest hand downloads"
-version: 3.3.0
+version: 1.1.1
 allowed-tools: Read,Write,Bash,Glob,Grep
 metadata:
   requires:
@@ -13,7 +13,7 @@ metadata:
     python: [curl_cffi, websocket-client]
 ---
 
-# lit-fetch v3.2 — 调用可移植包
+# lit-fetch v1.1.1 — 调用可移植包
 
 逻辑全在 `litfetch` 包里（`core` 无网络、`io` 走网络；`pymupdf` 必需，`curl_cffi`/`websocket-client` 可选）。
 **本文件随 wheel 一起分发**：`litfetch skill` 写出、`litfetch skill --check` 校验，所以 skill 不会和 CLI 漂移
