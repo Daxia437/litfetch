@@ -31,16 +31,34 @@ Without extras the package still runs, with two degradations it will tell you ab
 | `browser` → `websocket-client` | the real-Chrome tier (L3) | paid/blocked publishers go to the manual tier |
 | `tls` → `curl_cffi` | one retry with a Chrome TLS fingerprint | hosts that filter on TLS/UA answer 403 forever |
 
-The agent skill ships **inside the wheel** — one version number for the CLI and the skill:
-
-```bash
-litfetch skill                 # write ~/.workbuddy/skills/lit-fetch/SKILL.md
-litfetch skill --check         # exit 1 if the installed copy has drifted
-litfetch skill --print         # stdout, for any other agent harness
-```
-
 No other state is created. `LITFETCH_MAILTO=you@example.com` is optional but recommended — Unpaywall
 asks for an address, and the tier is skipped when it is unset.
+
+---
+
+## Driving it from an agent
+
+Everything above works from a terminal. If you do the work through an agent, the
+package also carries the instructions that agent needs — eight disciplines such as
+*diagnose before retrying* and *identity is not version*, each written after a batch
+went wrong without it. It ships inside the wheel, so it can never disagree with the
+CLI's version:
+
+```bash
+litfetch skill                 # install into ~/.workbuddy/skills/lit-fetch/
+litfetch skill --check         # exit 1 if the installed copy has drifted
+litfetch skill --target DIR    # another harness's skills directory
+litfetch skill --print         # stdout, for anything that takes a prompt
+```
+
+The skill is optional; the CLI never depends on it. Without it an agent can still
+call `litfetch`, it just will not know the disciplines — most visibly, it will
+re-try the same host after a bot wall instead of stopping to report it.
+
+**Restart the agent after installing.** Skills are enumerated when a session
+starts, so a copy written mid-session is invisible until the next one. Check what
+you have with `litfetch skill --check`, which compares the installed file
+byte-for-byte against the one in the wheel.
 
 ---
 
