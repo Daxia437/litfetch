@@ -1,17 +1,57 @@
 # litfetch
 
-Fetch academic PDFs in batches, and **prove that each file is the paper it claims to be**.
+**A skill for your research agent: fetch papers, and prove that each file is the paper it claims to be.**
 
 Built after a 2026-10 audit in which 10 of ~100 downloaded papers turned out to be the wrong paper,
 7 "PDFs" turned out to be HTML landing pages, and none of it was noticed until someone tried to cite them.
 The download was never the hard part. The verification was.
 
-Pure standard library. No network SDK, no browser automation required, no config file. Runs the same on
-macOS, Linux and Windows with Python 3.10+.
+Downloading is **one part** of this, not the whole of it. Five jobs, and the middle three are the reason
+it exists:
+
+| job | what it gives you |
+|---|---|
+| **fetch** | the bytes — arXiv, OA indexes, the publisher, the author's page, in that order |
+| **verify identity** | proof that the file is the cited paper: page-1 title block, contiguous word order, author and year |
+| **label the version** | preprint / accepted / version of record, with the evidence that decided it |
+| **diagnose** | a named reason per failure — Cloudflare, bot wall, human check, paywall, needs JS, dead link — each with the single next step |
+| **keep a ledger, and audit** | `PROVENANCE.jsonl`, plus library ↔ bibliography in both directions |
+
+Fetching is the entry point — without bytes there is nothing to verify. But a fetch that ends with the
+wrong file is worse than no fetch, so in this tool every downloaded byte passes through the identity and
+version check *before* it is stored. That ordering is the design: **fetch, then prove, then keep**.
+
+**Out of scope, deliberately:** paywall circumvention (no Sci-Hub of any kind), judgements about whether
+a paper's argument is correct, reference management, and writing.
 
 ---
 
 ## Install
+
+### A. You work through an agent — no terminal needed
+
+If your agent can run shell commands (WorkBuddy, Claude Code, or any local coding agent), the agent
+installs everything for you. You never type a command; you paste one sentence.
+
+**1. Give the agent this instruction:**
+
+> Install litfetch: run
+> `pipx install "litfetch[all] @ git+https://github.com/Daxia437/litfetch"`,
+> then run `litfetch skill`, and confirm that `litfetch skill --check` prints "identical".
+
+If `pipx` is not installed, the same sentence works with
+`python -m pip install --user "litfetch[all] @ git+https://github.com/Daxia437/litfetch"` instead.
+The `[all]` part brings the three optional pieces the agent will want; without them the tool still
+runs, with the degradations listed in B.
+
+**2. Restart the agent.** Skills are read when a session starts, so one installed mid-session is
+invisible until the next one.
+
+**3. Ask for what you want, in ordinary language** — "check whether this PDF is the paper I cited",
+"download these 60 references and tell me which ones failed and why". The agent picks the command;
+see [Using it from an agent](#using-it-from-an-agent) for the phrasing that works best.
+
+### B. You work in a shell
 
 ```bash
 # isolated, recommended
@@ -23,7 +63,10 @@ python -m venv .venv && . .venv/bin/activate      # Windows: .venv\Scripts\activ
 pip install -e "/path/to/tools/litfetch[all]"
 ```
 
-Without extras the package still runs, with two degradations it will tell you about in `litfetch doctor`:
+Pure standard library — no network SDK, no browser automation, no config file. Runs the same on
+macOS, Linux and Windows with Python 3.10+.
+
+Without extras the package still runs, with the degradations below; `litfetch doctor` reports which ones apply:
 
 | extra | brings | without it |
 |---|---|---|
@@ -36,29 +79,35 @@ asks for an address, and the tier is skipped when it is unset.
 
 ---
 
-## Driving it from an agent
+## Using it from an agent
 
-Everything above works from a terminal. If you do the work through an agent, the
-package also carries the instructions that agent needs — eight disciplines such as
-*diagnose before retrying* and *identity is not version*, each written after a batch
-went wrong without it. It ships inside the wheel, so it can never disagree with the
-CLI's version:
+The package carries the instructions an agent needs to use it well: eight disciplines such as
+*diagnose before retrying* and *identity is not version*, each written after a batch went wrong
+without it. The file ships inside the wheel, so it can never disagree with the CLI's version.
 
-```bash
-litfetch skill                 # install into ~/.workbuddy/skills/lit-fetch/
-litfetch skill --check         # exit 1 if the installed copy has drifted
-litfetch skill --target DIR    # another harness's skills directory
-litfetch skill --print         # stdout, for anything that takes a prompt
-```
+### Enable the skill
 
-The skill is optional; the CLI never depends on it. Without it an agent can still
-call `litfetch`, it just will not know the disciplines — most visibly, it will
-re-try the same host after a bot wall instead of stopping to report it.
+| your harness | do this |
+|---|---|
+| WorkBuddy | `litfetch skill` — writes `~/.workbuddy/skills/lit-fetch/SKILL.md` |
+| any tool with a skills directory | `litfetch skill --target DIR` |
+| no folder convention (chat apps, custom instructions) | `litfetch skill --print`, then paste the output |
 
-**Restart the agent after installing.** Skills are enumerated when a session
-starts, so a copy written mid-session is invisible until the next one. Check what
-you have with `litfetch skill --check`, which compares the installed file
-byte-for-byte against the one in the wheel.
+**Then restart the agent.** Skills are enumerated at session start; a copy written mid-session is
+invisible until the next one. `litfetch skill --check` compares the installed file byte-for-byte
+with the one in the wheel, and exits 1 if they differ.
+
+### What to say
+
+| you say | the agent does |
+|---|---|
+| "check whether this PDF is the paper I cited" | `verify` — identity, version, and what is wrong if it is wrong |
+| "download these 60 references, and tell me which failed and why" | `fetch`, then a report grouped by reason |
+| "does my library match this review?" | `audit` — both directions, with mismatches named |
+| "why won't this one download?" | `diagnose` — one of six reasons plus the next step |
+
+You are not expected to know the commands; the skill does. On a machine where the agent has a shell,
+it runs them and reports back in prose.
 
 ---
 
