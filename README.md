@@ -148,7 +148,10 @@ a fingerprint problem. The honest path for those hosts is one human download plu
 
 ---
 
-## Quick start
+## Command reference
+
+If you drive this through an agent, you do not need this list — the skill picks the command from what
+you ask for. It is here for shell users, and for reading alongside the tests.
 
 ```bash
 litfetch doctor                                  # what this machine can do
